@@ -9,7 +9,7 @@ from collections import defaultdict
 from truffleHog3.types import Issue, Issues, Meta
 
 
-__all__ = ("TEXT", "JSON", "YAML", "HTML")
+__all__ = ("TEXT", "SIMPLE", "JSON", "YAML", "HTML")
 
 
 class _colors:
@@ -31,6 +31,7 @@ Commit: {commit}
 Hash:   {commitHash}
 %s{strings}
 ~~~~~~~~~~~~~~~~~~~~~"""
+_SIMPLE_TEMPLATE = "{path}:{strings} {reason}"
 
 _HTML_STATIC_FOLDER = os.path.dirname(os.path.dirname(__file__))
 _HTML_TEMPLATE = "report.j2"
@@ -59,6 +60,22 @@ class TEXT(Engine):
 
     def load_template(self):
         self.template = _TEXT_TEMPLATE % (_colors.OKGREEN, _colors.ENDC)
+
+
+class SIMPLE(Engine):
+    def __init__(self, issues: Issues):
+        self.load_template()
+        super().__init__(issues)
+
+    def __str__(self):
+        return "\n".join(self._render(i) for i in self.issues)
+
+    def _render(self, issue: Issue) -> str:
+        strings = "\n".join(issue["stringsFound"])
+        return self.template.format(**issue, strings=strings)
+
+    def load_template(self):
+        self.template = _SIMPLE_TEMPLATE
 
 
 class JSON(Engine):

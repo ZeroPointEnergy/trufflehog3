@@ -17,7 +17,7 @@ from urllib import parse
 from truffleHog3.lib import log, utils
 from truffleHog3.lib.source import Simple, Git, SELF
 from truffleHog3.lib.search import Regex, Entropy
-from truffleHog3.lib.render import TEXT, JSON, YAML, HTML
+from truffleHog3.lib.render import TEXT, SIMPLE, JSON, YAML, HTML
 from truffleHog3.types import Config, File, Issues, Rules
 
 
@@ -104,6 +104,8 @@ def scan(path: str, config: Config, rules: Rules = None) -> Issues:
 def write(issues: Issues, file: File = None, format: str = "text"):
     if format == "text":
         f = TEXT
+    elif format == "simple":
+        f = SIMPLE
     elif format == "json":
         f = JSON
     elif format == "yaml":
@@ -199,10 +201,10 @@ def _get_cmdline_args(**defaults) -> argparse.Namespace:
     parser.add_argument(
         "-f",
         "--format",
-        help="output format {text, json, yaml, html}",
+        help="output format {text, simple, json, yaml, html}",
         dest="format",
         type=lambda f: f.lower(),
-        choices=["text", "json", "yaml", "html"],
+        choices=["text", "simple", "json", "yaml", "html"],
         default="text",
     )
     parser.add_argument(
